@@ -17,7 +17,7 @@ export class OrderService {
       const grossAmount = currentPricePerShare * shares;
       const orderToPersist = {
         ...createOrder,
-        amount: grossAmount,
+        gross_amount: grossAmount,
       };
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       const newOrder = plainToInstance(

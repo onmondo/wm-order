@@ -20,8 +20,7 @@ export class CreateOrderDto {
   price?: number;
 
   @Expose()
-  @IsNumber()
-  amount: number;
+  gross_amount: number;
 
   @Expose()
   @IsNumber()
