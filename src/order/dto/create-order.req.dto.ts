@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Expose, Type } from 'class-transformer';
 import {
+  IsArray,
   IsDate,
   IsNotEmpty,
   IsNumber,
   IsString,
   Length,
 } from 'class-validator';
+import { OrderActionRequest } from './order-action.req.dto';
 
 export class CreateOrderRequestDto {
   @Expose()
@@ -14,18 +16,9 @@ export class CreateOrderRequestDto {
   @Length(1, 10)
   ticker: string;
 
-  @Expose()
-  @IsString()
-  type: 'BUY' | 'SELL' | 'DIV';
-
-  @IsNumber()
+  @IsArray()
   @IsNotEmpty()
-  currentPricePerShare?: number;
-
-  @Expose()
-  @IsNumber()
-  @IsNotEmpty()
-  shares: number;
+  actions: Array<OrderActionRequest>;
 
   @Expose()
   @IsNumber()

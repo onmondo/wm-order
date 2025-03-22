@@ -11,21 +11,31 @@ export class OrderService {
   constructor(private readonly repository: OrderRepository) {}
 
   async createOrder(createOrder: CreateOrderRequestDto) {
-    const { currentPricePerShare, shares } = createOrder;
+    const { ticker, gains, date, remarks } = createOrder;
+    const transactions = createOrder.actions.map((action) => {
+      const { type, currentPricePerShare, shares } = action;
+      if (currentPricePerShare && shares) {
+        const grossAmount = currentPricePerShare * shares;
+        const orderToPersist = {
+          ticker,
+          type,
+          currentPricePerShare,
+          gross_amount: grossAmount,
+          shares,
+          gains,
+          date,
+          remarks,
+        };
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        const newOrder = plainToInstance(
+          CreateOrderDto,
+          orderToPersist,
+        ) as CreateOrderDto;
 
-    if (currentPricePerShare && shares) {
-      const grossAmount = currentPricePerShare * shares;
-      const orderToPersist = {
-        ...createOrder,
-        gross_amount: grossAmount,
-      };
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      const newOrder = plainToInstance(
-        CreateOrderDto,
-        orderToPersist,
-      ) as CreateOrderDto;
+        return this.repository.createOrder(newOrder);
+      }
+    });
 
-      await this.repository.createOrder(newOrder);
-    }
+    await Promise.all(transactions);
   }
 }
