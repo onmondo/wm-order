@@ -9,13 +9,23 @@ import { OrderRepository } from './order.repository';
 })
 export class OrderService {
   constructor(private readonly repository: OrderRepository) {}
-  async createOrder(createOrder: CreateOrderRequestDto) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    const newOrder = plainToInstance(
-      CreateOrderDto,
-      createOrder,
-    ) as CreateOrderDto;
 
-    await this.repository.createOrder(newOrder);
+  async createOrder(createOrder: CreateOrderRequestDto) {
+    const { currentPricePerShare, shares } = createOrder;
+
+    if (currentPricePerShare && shares) {
+      const grossAmount = currentPricePerShare * shares;
+      const orderToPersist = {
+        ...createOrder,
+        amount: grossAmount,
+      };
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      const newOrder = plainToInstance(
+        CreateOrderDto,
+        orderToPersist,
+      ) as CreateOrderDto;
+
+      await this.repository.createOrder(newOrder);
+    }
   }
 }
