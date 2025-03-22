@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Expose, Type } from 'class-transformer';
-import { IsDate, IsNumber, IsString, Length } from 'class-validator';
+import {
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class CreateOrderRequestDto {
   @Expose()
@@ -13,14 +19,12 @@ export class CreateOrderRequestDto {
   type: 'BUY' | 'SELL' | 'DIV';
 
   @IsNumber()
+  @IsNotEmpty()
   currentPricePerShare?: number;
 
   @Expose()
   @IsNumber()
-  amount: number;
-
-  @Expose()
-  @IsNumber()
+  @IsNotEmpty()
   shares: number;
 
   @Expose()
