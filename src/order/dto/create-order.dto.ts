@@ -11,13 +11,13 @@ export class CreateOrderDto {
   @Length(1, 10)
   ticker: string;
 
-  @Expose()
+  @Expose({ name: 'type' })
   @IsString()
-  type: 'BUY' | 'SELL' | 'DIV';
+  transaction_type: 'BUY' | 'SELL' | 'DIV';
 
   @Expose({ name: 'currentPricePerShare' })
   @IsNumber()
-  current_price_per_share?: number;
+  price?: number;
 
   @Expose()
   @IsNumber()

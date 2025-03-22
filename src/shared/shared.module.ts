@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { LoggerService } from 'src/shared/logger-service/logger-service';
+import { LoggerService, SupabaseService } from './';
 
 @Module({
-  providers: [LoggerService],
-  exports: [LoggerService],
+  providers: [LoggerService, SupabaseService],
+  exports: [LoggerService, SupabaseService],
 })
 export class SharedModule {}

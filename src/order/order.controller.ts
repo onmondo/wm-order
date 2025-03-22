@@ -8,9 +8,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { CreateOrderDto, CreateOrderRequestDto } from './dto';
-import { plainToInstance } from 'class-transformer';
-import { LoggerService } from 'src/shared/logger-service/logger-service';
+import { CreateOrderRequestDto } from './dto';
+import { LoggerService } from 'src/shared';
 
 @Controller('order')
 @Injectable()
@@ -29,13 +28,13 @@ export class OrderController {
     }),
   )
   @HttpCode(201)
-  createOrder(@Body() request: CreateOrderRequestDto): { message: string } {
+  async createOrder(
+    @Body() request: CreateOrderRequestDto,
+  ): Promise<{ message: string }> {
     console.log('request', request);
     this.logger.log();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-    const newOrder = plainToInstance(CreateOrderDto, request);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    this.order.createOrder(newOrder);
+    await this.order.createOrder(request);
+
     return {
       message: 'success',
     };
