@@ -26,11 +26,8 @@ export class OrderService {
           date,
           remarks,
         };
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        const newOrder = plainToInstance(
-          CreateOrderDto,
-          orderToPersist,
-        ) as CreateOrderDto;
+
+        const newOrder = plainToInstance(CreateOrderDto, orderToPersist);
 
         return this.repository.createOrder(newOrder);
       }
