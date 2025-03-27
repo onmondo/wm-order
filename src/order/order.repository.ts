@@ -1,12 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { SupabaseService } from 'src/shared';
-import { GetOrderDto } from './dto';
-import {
-  SortOption,
-  FilterOption,
-  // PaginationOption
-} from './interface';
+import { FetchOrderRequestDto, GetOrderDto } from './dto';
+// import { SortOption, FilterOption, PaginationOption } from './interface';
 
 @Injectable()
 export class OrderRepository {
@@ -47,21 +43,22 @@ export class OrderRepository {
   }
 
   async fetchOrdersFilterByColumn(
-    filterOption: FilterOption,
-    sortOption: SortOption,
-    // paginationOption: PaginationOption,
+    fetchOrderRequestDto: FetchOrderRequestDto,
   ): Promise<GetOrderDto[]> {
-    // const from = (paginationOption?.page - 1) * paginationOption?.limit;
-    // const to = from + paginationOption?.limit;
+    const from = fetchOrderRequestDto
+      ? (fetchOrderRequestDto?.page - 1) * fetchOrderRequestDto?.limit
+      : 0;
+    const to = from + fetchOrderRequestDto?.limit - 1;
 
     const orderDbTable = this.supabase.getClient().from('orders');
     const { data, error } = await orderDbTable
       .select(
         'ticker, transaction_type, price, shares, gross_amount, gains, date',
       )
-      .eq(filterOption.columnName, filterOption.value)
-      // .range(from, to)
-      .order(sortOption.columnName, { ascending: sortOption.ascending });
+      .eq(fetchOrderRequestDto.columnName, fetchOrderRequestDto.value)
+      .order('date', { ascending: false })
+      .range(from, to);
+    // .order(sortOption.columnName, { ascending: sortOption.ascending });
 
     if (error) throw error;
 

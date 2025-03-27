@@ -4,7 +4,7 @@ import { plainToInstance } from 'class-transformer';
 import { CreateOrderRequestDto, GetOrderDto } from './dto';
 import { OrderRepository } from './order.repository';
 import { GetOrderResDto } from './dto/get-order.res.dto';
-// import { PaginationOption } from './interface';
+import { FetchOrderRequestDto } from './dto/fetch-order.req.dto';
 
 @Injectable({
   scope: Scope.DEFAULT,
@@ -47,15 +47,10 @@ export class OrderService {
   }
 
   async getOrdersByTicker(
-    ticker: string,
-    // paginationOption: PaginationOption,
+    fetchOrderOptions: FetchOrderRequestDto,
   ): Promise<GetOrderResDto[]> {
     const orders: GetOrderDto[] =
-      await this.repository.fetchOrdersFilterByColumn(
-        { columnName: 'ticker', value: ticker },
-        { columnName: 'date', ascending: false },
-        // paginationOption,
-      );
+      await this.repository.fetchOrdersFilterByColumn(fetchOrderOptions);
 
     const response = plainToInstance(GetOrderResDto, orders);
     return response;

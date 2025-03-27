@@ -6,6 +6,7 @@ import {
   Injectable,
   Param,
   Post,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { OrderService } from './order.service';
 import { CreateOrderRequestDto } from './dto';
 import { LoggerService } from 'src/shared';
 import { GetOrderResDto } from './dto/get-order.res.dto';
+import { FetchOrderRequestDto } from './dto/fetch-order.req.dto';
 
 @Controller('order')
 @Injectable()
@@ -43,24 +45,33 @@ export class OrderController {
   }
 
   @Get()
-  async getOrders(): Promise<GetOrderResDto[]> {
-    const response = await this.order.getOrders();
+  async getOrders(
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ): Promise<GetOrderResDto[]> {
+    const fetchOrderRequest: FetchOrderRequestDto = {
+      page: page || 1,
+      limit: limit || 10,
+      columnName: '',
+      value: '',
+    };
+    const response = await this.order.getOrdersByTicker(fetchOrderRequest);
     return response;
   }
 
   @Get('/ticker/:ticker')
   async getOrdersByTicker(
-    @Param('ticker') ticker: string,
-    // @Param('page') page: number,
-    // @Param('limit') limit: number,
+    @Param('ticker') ticker?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
   ): Promise<GetOrderResDto[]> {
-    const response = await this.order.getOrdersByTicker(
-      ticker,
-      // {
-      //   page,
-      //   limit,
-      // }
-    );
+    const fetchOrderRequest: FetchOrderRequestDto = {
+      columnName: 'ticker',
+      value: ticker || '',
+      page: page || 1,
+      limit: limit || 10,
+    };
+    const response = await this.order.getOrdersByTicker(fetchOrderRequest);
     return response;
   }
 }
