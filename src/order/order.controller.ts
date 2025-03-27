@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   Injectable,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
@@ -10,6 +12,7 @@ import {
 import { OrderService } from './order.service';
 import { CreateOrderRequestDto } from './dto';
 import { LoggerService } from 'src/shared';
+import { GetOrderResDto } from './dto/get-order.res.dto';
 
 @Controller('order')
 @Injectable()
@@ -31,12 +34,33 @@ export class OrderController {
   async createOrder(
     @Body() request: CreateOrderRequestDto,
   ): Promise<{ message: string }> {
-    console.log('request', request);
     this.logger.log();
     await this.order.createOrder(request);
 
     return {
       message: 'success',
     };
+  }
+
+  @Get()
+  async getOrders(): Promise<GetOrderResDto[]> {
+    const response = await this.order.getOrders();
+    return response;
+  }
+
+  @Get('/ticker/:ticker')
+  async getOrdersByTicker(
+    @Param('ticker') ticker: string,
+    // @Param('page') page: number,
+    // @Param('limit') limit: number,
+  ): Promise<GetOrderResDto[]> {
+    const response = await this.order.getOrdersByTicker(
+      ticker,
+      // {
+      //   page,
+      //   limit,
+      // }
+    );
+    return response;
   }
 }

@@ -1,8 +1,10 @@
 import { Injectable, Scope } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { plainToInstance } from 'class-transformer';
-import { CreateOrderRequestDto } from './dto';
+import { CreateOrderRequestDto, GetOrderDto } from './dto';
 import { OrderRepository } from './order.repository';
+import { GetOrderResDto } from './dto/get-order.res.dto';
+// import { PaginationOption } from './interface';
 
 @Injectable({
   scope: Scope.DEFAULT,
@@ -34,5 +36,28 @@ export class OrderService {
     });
 
     await Promise.all(transactions);
+  }
+
+  async getOrders(): Promise<GetOrderResDto[]> {
+    const orders: GetOrderDto[] =
+      await this.repository.fetchOrdersSortedByDate(false);
+
+    const response = plainToInstance(GetOrderResDto, orders);
+    return response;
+  }
+
+  async getOrdersByTicker(
+    ticker: string,
+    // paginationOption: PaginationOption,
+  ): Promise<GetOrderResDto[]> {
+    const orders: GetOrderDto[] =
+      await this.repository.fetchOrdersFilterByColumn(
+        { columnName: 'ticker', value: ticker },
+        { columnName: 'date', ascending: false },
+        // paginationOption,
+      );
+
+    const response = plainToInstance(GetOrderResDto, orders);
+    return response;
   }
 }
