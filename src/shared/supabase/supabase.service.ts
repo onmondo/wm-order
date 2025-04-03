@@ -1,4 +1,5 @@
 import { Injectable, Scope } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable({
@@ -7,20 +8,18 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 export class SupabaseService {
   private supabase: SupabaseClient;
 
-  constructor() {
-    if (
-      process.env &&
-      process.env.DATABASE_URL &&
-      process.env.DATABASE_API_KEY
-    ) {
-      this.supabase = createClient(
-        process.env.DATABASE_URL,
-        process.env.DATABASE_API_KEY,
-      );
-    }
+  constructor(private configService: ConfigService) {
+    this.supabase = createClient(
+      this.getEnvVar('DATABASE_URL'),
+      this.getEnvVar('DATABASE_API_KEY'),
+    );
   }
 
   getClient(): SupabaseClient {
     return this.supabase;
+  }
+
+  private getEnvVar(key: string): string {
+    return this.configService.get<string>(key) || '';
   }
 }
