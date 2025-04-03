@@ -25,7 +25,6 @@ export class UsersController {
     }),
   )
   async signIn(@Body() signInRequest: SignInRequestDto) {
-    console.log('signInRequest', signInRequest);
     const user = await this.user.signInUser(signInRequest);
 
     return {

@@ -25,22 +25,17 @@ export class UsersService {
     );
 
     if (user && user.length > 0) {
-      console.log('user exist', user);
       throw new HttpErrorByCode[409]();
     }
     await this.repository.createUser(newUserRegistration);
   }
 
   async signInUser(userSignInRequest: SignInRequestDto) {
-    console.log('userSignInRequest', userSignInRequest);
     const signInUser = plainToInstance(SignInUserDto, userSignInRequest);
-    console.log('signInUser', signInUser);
     const user = await this.repository.fetchUserByUsername(signInUser.username);
-    console.log('user', user);
     if (user && user.length > 0) {
       const { username, password, active, email_address, fullname } = user[0];
       if (password === userSignInRequest.password) {
-        console.log('Generating token...');
         const accessToken = await this.generateAccessToken({
           username,
           isActive: active,

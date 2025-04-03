@@ -7,12 +7,13 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderRequestDto } from './dto';
-import { LoggerService } from 'src/shared';
+import { AuthGuard, LoggerService } from 'src/shared';
 import { GetOrderResDto } from './dto/get-order.res.dto';
 import { FetchOrderRequestDto } from './dto/fetch-order.req.dto';
 
@@ -24,6 +25,7 @@ export class OrderController {
     private readonly logger: LoggerService, // Please use the logger service of Nest JS
   ) {}
 
+  @UseGuards(AuthGuard)
   @Post()
   @UsePipes(
     new ValidationPipe({
@@ -44,6 +46,7 @@ export class OrderController {
     };
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   async getOrders(
     @Query('page') page?: number,
@@ -59,6 +62,7 @@ export class OrderController {
     return response;
   }
 
+  @UseGuards(AuthGuard)
   @Get('/ticker/:ticker')
   async getOrdersByTicker(
     @Param('ticker') ticker?: string,
