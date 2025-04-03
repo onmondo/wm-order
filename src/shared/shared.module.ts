@@ -1,9 +1,16 @@
 import { Module } from '@nestjs/common';
-import { LoggerService, SupabaseService } from './';
+import { AuthGuard, LoggerService, SupabaseService } from './';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  providers: [LoggerService, SupabaseService, ConfigService],
-  exports: [LoggerService, SupabaseService],
+  providers: [
+    LoggerService,
+    SupabaseService,
+    AuthGuard,
+    ConfigService,
+    JwtService,
+  ],
+  exports: [LoggerService, SupabaseService, AuthGuard],
 })
 export class SharedModule {}
