@@ -4,10 +4,15 @@ import { SignInRequestDto, SignInUserDto, SignUpRequestDto } from './dto';
 import { plainToInstance } from 'class-transformer';
 import { RegisterUserDto } from './dto/register.user.dto';
 import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
+import { JwtService } from '@nestjs/jwt';
+import { ICredentials } from './user.interfaces';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly repository: UserRepository) {}
+  constructor(
+    private readonly repository: UserRepository,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async registerUser(userRegistrationRequest: SignUpRequestDto) {
     const newUserRegistration = plainToInstance(
@@ -33,13 +38,24 @@ export class UsersService {
     const user = await this.repository.fetchUserByUsername(signInUser.username);
     console.log('user', user);
     if (user && user.length > 0) {
-      if (user[0].password === userSignInRequest.password) {
-        // Generate token here
+      const { username, password, active, email_address, fullname } = user[0];
+      if (password === userSignInRequest.password) {
         console.log('Generating token...');
-        return user[0].username;
+        const accessToken = await this.generateAccessToken({
+          username,
+          isActive: active,
+          emailAddress: email_address,
+          fullname,
+        });
+        return { accessToken };
       }
     }
 
     throw new HttpErrorByCode[401]();
+  }
+
+  private async generateAccessToken(credentials: ICredentials) {
+    const accessToken = await this.jwtService.signAsync(credentials);
+    return accessToken;
   }
 }
